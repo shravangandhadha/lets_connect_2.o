@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Let's Connect{% endblock %}</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f5f7fb; }
+    nav { background: #7c3aed; color: white; padding: 1rem; }
+    nav a { color: white; margin-right: 1rem; text-decoration: none; }
+    .container { max-width: 1000px; margin: 2rem auto; padding: 1rem; }
+    .card { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="{% url 'home' %}">Home</a>
+    {% if member %}
+      <a href="{% url 'dashboard' %}">Dashboard</a>
+      <a href="{% url 'profile' %}">Profile</a>
+      <a href="{% url 'logout' %}">Logout</a>
+    {% else %}
+      <a href="{% url 'login' %}">Login</a>
+      <a href="{% url 'register' %}">Register</a>
+    {% endif %}
+  </nav>
+  <div class="container">
+    {% if messages %}
+      {% for msg in messages %}
+        <div class="card" style="margin-bottom: 1rem;">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

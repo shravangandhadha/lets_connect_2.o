@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: lets-connect
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: gunicorn Lets_Connect.wsgi:application
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: lets-connect.onrender.com
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://lets-connect.onrender.com

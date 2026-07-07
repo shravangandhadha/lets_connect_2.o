@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Let's Connect - Profile{% endblock %}
+{% block content %}
+  <div class="card">
+    <h2>Profile</h2>
+    <p>Name: {{ member.name }}</p>
+    <p>Email: {{ member.email }}</p>
+  </div>
+{% endblock %}
