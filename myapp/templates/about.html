@@ -1,8 +1,212 @@
-{% extends 'base.html' %}
-{% block title %}Let's Connect - Home{% endblock %}
-{% block content %}
-  <div class="card">
-    <h1>Let's Connect</h1>
-    <p>Welcome to your local connection platform.</p>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Let's Connect - Build Local Community</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f9fc; color: #1e1e2e; }
+
+  /* Header */
+  header { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); border-bottom: 1px solid #e5e7ed; padding: 16px 0; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+  .header-inner { display: flex; justify-content: space-between; align-items: center; }
+  .logo { display: flex; align-items: center; gap: 8px; }
+  .logo-icon { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #ec4899); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; }
+  .logo-text { font-size: 24px; font-weight: 700; background: linear-gradient(135deg, #7c3aed, #ec4899); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .header-buttons { display: flex; gap: 8px; }
+  .btn { padding: 10px 24px; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer; border: none; transition: all 0.3s; }
+  .btn-outline { background: transparent; border: 1.5px solid #e5e7ed; color: #1e1e2e; }
+  .btn-outline:hover { background: #f0f0f5; }
+  .btn-primary { background: linear-gradient(135deg, #7c3aed, #ec4899); color: white; box-shadow: 0 4px 20px rgba(124,58,237,0.25); }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+  /* Hero */
+  .hero { min-height: 85vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 80px 20px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 30% 40%, rgba(124,58,237,0.08) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(236,72,153,0.08) 0%, transparent 50%), radial-gradient(circle at 50% 80%, rgba(6,182,212,0.06) 0%, transparent 50%); }
+  .hero-content { position: relative; z-index: 2; }
+  .badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(124,58,237,0.1); color: #7c3aed; padding: 6px 16px; border-radius: 999px; font-size: 14px; font-weight: 500; margin-bottom: 20px; }
+  .hero h2 { font-size: clamp(40px, 7vw, 72px); font-weight: 800; line-height: 1.1; margin-bottom: 24px; background: linear-gradient(135deg, #7c3aed, #ec4899, #7c3aed); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero p { font-size: 18px; color: #6b6b80; max-width: 600px; margin: 0 auto 32px; line-height: 1.6; }
+  .hero-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+  /* Floating 3D shapes */
+  .shapes { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .shape { position: absolute; border-radius: 50%; filter: blur(1px); animation: float 6s ease-in-out infinite; }
+  .shape-1 { width: 120px; height: 120px; background: linear-gradient(135deg, rgba(124,58,237,0.3), rgba(124,58,237,0.05)); top: 15%; left: 10%; animation-delay: 0s; }
+  .shape-2 { width: 80px; height: 80px; background: linear-gradient(135deg, rgba(236,72,153,0.3), rgba(236,72,153,0.05)); top: 25%; right: 15%; animation-delay: 1s; }
+  .shape-3 { width: 60px; height: 60px; background: linear-gradient(135deg, rgba(6,182,212,0.3), rgba(6,182,212,0.05)); bottom: 30%; left: 20%; animation-delay: 2s; }
+  .shape-4 { width: 100px; height: 100px; background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(236,72,153,0.1)); bottom: 20%; right: 10%; animation-delay: 0.5s; border-radius: 30%; animation-name: float-rotate; }
+  .shape-5 { width: 40px; height: 40px; background: rgba(124,58,237,0.25); top: 60%; left: 50%; animation-delay: 3s; }
+  @keyframes float { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-30px) scale(1.05); } }
+  @keyframes float-rotate { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-25px) rotate(45deg); } }
+
+  /* Torus CSS shape */
+  .torus { position: absolute; border: 6px solid rgba(124,58,237,0.2); border-radius: 50%; animation: spin 12s linear infinite; }
+  .torus-1 { width: 200px; height: 200px; top: 10%; right: 5%; border-color: rgba(124,58,237,0.15); }
+  .torus-2 { width: 150px; height: 150px; bottom: 15%; left: 5%; border-color: rgba(236,72,153,0.15); animation-direction: reverse; }
+  @keyframes spin { from { transform: rotate(0deg) rotateX(60deg); } to { transform: rotate(360deg) rotateX(60deg); } }
+
+  /* Categories */
+  .categories { padding: 80px 20px; }
+  .categories h3, .features h3, .cta h3 { font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 48px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+  .card { background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); border-radius: 16px; padding: 28px; cursor: pointer; transition: all 0.3s; border: 1px solid #e5e7ed; }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(124,58,237,0.1); }
+  .card-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  .card h4 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+  .card p { color: #6b6b80; font-size: 14px; line-height: 1.5; }
+  .grad-1 { background: linear-gradient(135deg, #7c3aed, #ec4899); }
+  .grad-2 { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
+  .grad-3 { background: linear-gradient(135deg, #f97316, #ef4444); }
+  .grad-4 { background: linear-gradient(135deg, #22c55e, #10b981); }
+  .grad-5 { background: linear-gradient(135deg, #6366f1, #7c3aed); }
+  .grad-6 { background: linear-gradient(135deg, #ec4899, #f43f5e); }
+
+  /* Features */
+  .features { padding: 80px 20px; }
+  .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  .feature-item { display: flex; gap: 16px; margin-bottom: 24px; }
+  .feature-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
+  .feature-item h4 { font-weight: 600; margin-bottom: 4px; }
+  .feature-item p { color: #6b6b80; font-size: 14px; }
+  .stats-box { background: linear-gradient(135deg, rgba(124,58,237,0.05), rgba(236,72,153,0.05)); border-radius: 20px; padding: 40px; text-align: center; position: relative; overflow: hidden; min-height: 320px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+  .stat { font-size: 40px; font-weight: 800; background: linear-gradient(135deg, #7c3aed, #ec4899); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .stat-label { color: #6b6b80; font-size: 14px; background: rgba(255,255,255,0.6); padding: 2px 10px; border-radius: 6px; }
+  .stat-2 { font-size: 28px; }
+
+  /* 3D orbit rings in stats */
+  .orbit { position: absolute; border: 2px solid rgba(124,58,237,0.12); border-radius: 50%; animation: spin 10s linear infinite; }
+  .orbit-1 { width: 280px; height: 280px; top: 50%; left: 50%; margin-top: -140px; margin-left: -140px; }
+  .orbit-2 { width: 220px; height: 220px; top: 50%; left: 50%; margin-top: -110px; margin-left: -110px; border-color: rgba(236,72,153,0.12); animation-duration: 8s; animation-direction: reverse; }
+  .orbit-3 { width: 340px; height: 340px; top: 50%; left: 50%; margin-top: -170px; margin-left: -170px; border-color: rgba(6,182,212,0.1); animation-duration: 14s; }
+  .orbit-dot { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: #7c3aed; top: -4px; left: 50%; margin-left: -4px; }
+
+  /* CTA */
+  .cta { padding: 80px 20px; background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(236,72,153,0.06)); text-align: center; }
+  .cta p { color: #6b6b80; font-size: 18px; max-width: 600px; margin: 0 auto 32px; }
+
+  /* Footer */
+  footer { padding: 32px 20px; border-top: 1px solid #e5e7ed; text-align: center; background: rgba(255,255,255,0.5); }
+  .footer-logo { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px; }
+  .footer-logo-icon { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #ec4899); }
+  footer p { color: #6b6b80; font-size: 14px; }
+
+  /* Particles */
+  .particle { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: rgba(124,58,237,0.3); animation: particle-float 8s ease-in-out infinite; }
+  @keyframes particle-float { 0%, 100% { transform: translate(0, 0); opacity: 0.3; } 50% { transform: translate(20px, -20px); opacity: 0.7; } }
+
+  @media (max-width: 768px) {
+    .features-grid { grid-template-columns: 1fr; }
+    .grid { grid-template-columns: 1fr; }
+    .hero-buttons { flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">LC</div>
+        <div class="logo-text">Let's Connect</div>
+      </div>
+      <div class="header-buttons">
+        <a href="{% url 'login' %}" class="btn btn-outline">Login</a>
+        <a href="{% url 'register' %}" class="btn btn-primary">Get Started</a>
+      </div>
+    </div>
   </div>
-{% endblock %}
+</header>
+
+<section class="hero">
+  <div class="shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="shape shape-4"></div>
+    <div class="shape shape-5"></div>
+    <div class="torus torus-1"></div>
+    <div class="torus torus-2"></div>
+    <div class="particle" style="top:20%;left:30%;animation-delay:0s"></div>
+    <div class="particle" style="top:40%;left:60%;animation-delay:1s"></div>
+    <div class="particle" style="top:70%;left:25%;animation-delay:2s"></div>
+    <div class="particle" style="top:30%;left:80%;animation-delay:3s"></div>
+    <div class="particle" style="top:60%;left:45%;animation-delay:1.5s"></div>
+    <div class="particle" style="top:80%;left:70%;animation-delay:0.5s"></div>
+    <div class="particle" style="top:15%;left:55%;animation-delay:2.5s"></div>
+    <div class="particle" style="top:50%;left:15%;animation-delay:4s"></div>
+  </div>
+  <div class="hero-content">
+    <div class="badge">📍 Connect within 30km radius</div>
+    <h2>Connect Locally,<br>Build Community</h2>
+    <p>Discover amazing people in your area for hackathons, trips, networking, and friendship. Your local community is waiting to connect with you.</p>
+    <div class="hero-buttons">
+      <a href="{% url 'register' %}" class="btn btn-primary">👥 Start Connecting</a>
+      <a href="{% url 'browse' %}" class="btn btn-outline">💬 Explore Categories</a>
+    </div>
+  </div>
+</section>
+
+<section class="categories">
+  <div class="container">
+    <h3>What brings you together?</h3>
+    <div class="grid">
+      <div class="card"><div class="card-icon grad-1">💻</div><h4>Hackathon Teams</h4><p>Find talented developers for your next big project</p></div>
+      <div class="card"><div class="card-icon grad-2">✈️</div><h4>Travel Buddies</h4><p>Discover amazing travel companions for your adventures</p></div>
+      <div class="card"><div class="card-icon grad-3">☕</div><h4>Coffee Meetups</h4><p>Connect with locals over a cup of coffee</p></div>
+      <div class="card"><div class="card-icon grad-4">🏆</div><h4>Sports Partners</h4><p>Find teammates for sports and fitness activities</p></div>
+      <div class="card"><div class="card-icon grad-5">👥</div><h4>Professional Network</h4><p>Expand your professional connections</p></div>
+      <div class="card"><div class="card-icon grad-6">📅</div><h4>Event Companions</h4><p>Attend events with like-minded people</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="container">
+    <div class="features-grid">
+      <div>
+        <h3 style="text-align:left">Built for Local Connection</h3>
+        <div class="feature-item">
+          <div class="feature-icon" style="background:rgba(124,58,237,0.1);color:#7c3aed">📍</div>
+          <div><h4>Location-Based Matching</h4><p>Connect with people within your 30km radius for easy meetups</p></div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon" style="background:rgba(236,72,153,0.1);color:#ec4899">💬</div>
+          <div><h4>Real-time Chat & Calls</h4><p>Instant messaging and voice calls to plan your meetups</p></div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon" style="background:linear-gradient(135deg,#7c3aed,#ec4899);color:white">👥</div>
+          <div><h4>Filtered Categories</h4><p>Find exactly the right people for your specific interests</p></div>
+        </div>
+      </div>
+      <div class="stats-box">
+        <div class="orbit orbit-1"><div class="orbit-dot"></div></div>
+        <div class="orbit orbit-2"><div class="orbit-dot" style="background:#ec4899"></div></div>
+        <div class="orbit orbit-3"><div class="orbit-dot" style="background:#06b6d4"></div></div>
+        <div class="stat">30km</div><div class="stat-label">Connection Radius</div>
+        <div class="stat stat-2">6+</div><div class="stat-label">Categories Available</div>
+        <div class="stat stat-2">∞</div><div class="stat-label">Possibilities to Connect</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="container">
+    <h3>Ready to Connect?</h3>
+    <p>Join thousands of people already building meaningful connections in their local communities.</p>
+    <button class="btn btn-primary">Join Let's Connect Today</button>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo"><div class="footer-logo-icon"></div><strong>Let's Connect</strong></div>
+  <p>Building communities, one connection at a time.</p>
+</footer>
+
+</body>
+</html>

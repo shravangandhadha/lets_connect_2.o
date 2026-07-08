@@ -9,6 +9,10 @@ class TestBasicSite(TestCase):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
 
+    def test_register_page_contains_terms_checkbox_name(self):
+        response = self.client.get('/register/')
+        self.assertContains(response, 'name="terms"')
+
     def test_registration_hashes_password_and_redirects(self):
         response = self.client.post('/register/', {
             'name': 'Jane Doe',

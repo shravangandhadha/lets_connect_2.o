@@ -1,8 +1,151 @@
-{% extends 'base.html' %}
-{% block title %}Let's Connect - Call{% endblock %}
-{% block content %}
-  <div class="card">
-    <h2>Call</h2>
-    <p>Your calls will appear here.</p>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Let's Connect - Call</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f8f9fc;--fg:#1c1c22;--card:#fff;--primary:#7c3aed;--accent:#ff4da6;--muted:#71717a;--border:#e4e4e7;--secondary:#eff6ff;--green:#22c55e;--radius:0.75rem}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,var(--bg),var(--secondary));color:var(--fg);min-height:100vh;position:relative;overflow:hidden}
+a{text-decoration:none;color:inherit}
+
+.bg-pulse{position:absolute;inset:0;background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(255,77,166,0.08));animation:pulse 4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.5}50%{opacity:1}}
+
+header{position:relative;z-index:10;border-bottom:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.3);backdrop-filter:blur(12px)}
+header .container{max-width:1200px;margin:0 auto;padding:1rem;display:flex;justify-content:space-between;align-items:center}
+.nav-btn{padding:0.375rem 0.75rem;border:none;background:transparent;border-radius:var(--radius);cursor:pointer;font-size:0.8rem;color:var(--fg)}
+.nav-btn:hover{background:rgba(0,0,0,0.05)}
+.call-badge{padding:0.25rem 0.75rem;background:rgba(124,58,237,0.15);color:var(--primary);border-radius:999px;font-size:0.8rem;font-weight:500}
+
+.call-area{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 80px);gap:2rem;padding:2rem}
+
+.participant-card{background:rgba(255,255,255,0.3);backdrop-filter:blur(16px);border-radius:var(--radius);padding:2.5rem;text-align:center}
+.big-avatar{width:128px;height:128px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:700;margin:0 auto 1rem;position:relative}
+.big-avatar .online-dot{position:absolute;bottom:4px;right:4px;width:24px;height:24px;background:var(--green);border-radius:50%;border:4px solid rgba(255,255,255,0.5)}
+.participant-card h2{font-size:1.875rem;font-weight:700;margin-bottom:0.5rem}
+.cat-badge{display:inline-block;padding:0.125rem 0.625rem;border:1px solid var(--border);border-radius:999px;font-size:0.75rem;margin-bottom:0.5rem}
+.call-status{color:var(--muted);font-size:0.875rem}
+
+.video-area{background:rgba(255,255,255,0.3);backdrop-filter:blur(12px);border-radius:var(--radius);padding:2rem;width:100%;max-width:800px}
+.video-placeholder{aspect-ratio:16/9;background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(255,77,166,0.15));border-radius:var(--radius);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0.5rem;color:var(--muted)}
+.video-placeholder .icon{font-size:3rem}
+
+.controls{background:rgba(255,255,255,0.3);backdrop-filter:blur(12px);border-radius:var(--radius);padding:1.25rem 2rem}
+.controls-row{display:flex;align-items:center;justify-content:center;gap:1rem}
+.ctrl-btn{width:56px;height:56px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,0.5);cursor:pointer;font-size:1.25rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.ctrl-btn:hover{background:rgba(255,255,255,0.8)}
+.ctrl-btn.active{background:rgba(239,68,68,0.1);border-color:#ef4444;color:#ef4444}
+.ctrl-btn.end{width:64px;height:64px;background:#ef4444;border:none;color:#fff;font-size:1.5rem}
+.ctrl-btn.end:hover{background:#dc2626}
+
+.type-toggle{display:flex;gap:0.5rem}
+.toggle-btn{padding:0.5rem 1rem;border-radius:var(--radius);border:1px solid var(--border);background:transparent;cursor:pointer;font-size:0.8rem;display:flex;align-items:center;gap:0.375rem}
+.toggle-btn.active{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;border:none}
+
+.quality{background:rgba(255,255,255,0.2);backdrop-filter:blur(8px);border-radius:var(--radius);padding:0.75rem 1.5rem}
+.quality-row{display:flex;justify-content:center;gap:1.5rem;font-size:0.8rem;color:var(--muted)}
+.quality-item{display:flex;align-items:center;gap:0.375rem}
+.quality-dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
+</style>
+</head>
+<body>
+
+<div class="bg-pulse"></div>
+
+<header>
+  <div class="container">
+    <a href="{% url 'messages' %}" class="nav-btn">← Back to Messages</a>
+    <span class="call-badge" id="callBadge">Connecting...</span>
+    <a href="{% url 'messages' %}" class="nav-btn">💬</a>
   </div>
-{% endblock %}
+</header>
+
+<div class="call-area">
+  <div class="participant-card">
+    <div class="big-avatar">AC<div class="online-dot"></div></div>
+    <h2>Alex Chen</h2>
+    <span class="cat-badge">Hackathon Team</span>
+    <p class="call-status" id="callStatus">Connecting to call...</p>
+  </div>
+
+  <div class="video-area" id="videoArea" style="display:none">
+    <div class="video-placeholder" id="videoPlaceholder">
+      <div class="icon">📹</div>
+      <p>Video call in progress</p>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="controls-row">
+      <button class="ctrl-btn" id="muteBtn" onclick="toggleMute()">🎤</button>
+      <button class="ctrl-btn" id="videoBtn" onclick="toggleVideo()">📹</button>
+      <button class="ctrl-btn end" onclick="endCall()">📵</button>
+      <button class="ctrl-btn">🔊</button>
+      <button class="ctrl-btn">⚙️</button>
+    </div>
+  </div>
+
+  <div class="type-toggle">
+    <button class="toggle-btn" id="voiceToggle" onclick="setCallType('voice')">📞 Voice Call</button>
+    <button class="toggle-btn active" id="videoToggle" onclick="setCallType('video')">📹 Video Call</button>
+  </div>
+
+  <div class="quality" id="qualityBar" style="display:none">
+    <div class="quality-row">
+      <div class="quality-item"><div class="quality-dot"></div>HD Quality</div>
+      <div class="quality-item"><div class="quality-dot"></div>Strong Connection</div>
+      <div class="quality-item"><div class="quality-dot"></div>Low Latency</div>
+    </div>
+  </div>
+</div>
+
+<script>
+let muted=false,videoOn=true,isVideo=true,seconds=0,connected=false,timer;
+
+setTimeout(()=>{
+  connected=true;
+  document.getElementById('callBadge').textContent='Connected • 00:00';
+  document.getElementById('callStatus').textContent='Call duration: 00:00';
+  document.getElementById('videoArea').style.display='block';
+  document.getElementById('qualityBar').style.display='block';
+  timer=setInterval(()=>{
+    seconds++;
+    const m=String(Math.floor(seconds/60)).padStart(2,'0'),s=String(seconds%60).padStart(2,'0');
+    document.getElementById('callBadge').textContent=`Connected • ${m}:${s}`;
+    document.getElementById('callStatus').textContent=`Call duration: ${m}:${s}`;
+  },1000);
+},3000);
+
+function toggleMute(){
+  muted=!muted;
+  const btn=document.getElementById('muteBtn');
+  btn.textContent=muted?'🔇':'🎤';
+  btn.classList.toggle('active',muted);
+}
+function toggleVideo(){
+  videoOn=!videoOn;
+  const btn=document.getElementById('videoBtn');
+  btn.textContent=videoOn?'📹':'🚫';
+  btn.classList.toggle('active',!videoOn);
+  const ph=document.getElementById('videoPlaceholder');
+  ph.innerHTML=videoOn?'<div class="icon">📹</div><p>Video call in progress</p>':'<div class="icon">🚫</div><p>Video disabled</p>';
+}
+function setCallType(type){
+  isVideo=type==='video';
+  document.getElementById('voiceToggle').classList.toggle('active',!isVideo);
+  document.getElementById('videoToggle').classList.toggle('active',isVideo);
+  document.getElementById('videoArea').style.display=isVideo&&connected?'block':'none';
+}
+function endCall(){
+  clearInterval(timer);
+  document.getElementById('callBadge').textContent='Call Ended';
+  document.getElementById('callStatus').textContent='Call ended';
+  setTimeout(()=>window.location="{% url 'messages' %}",1000);
+}
+</script>
+
+</body>
+</html>

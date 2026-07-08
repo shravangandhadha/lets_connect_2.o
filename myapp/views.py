@@ -9,11 +9,18 @@ def get_current_member(request):
     member_id = request.session.get('member_id')
     if not member_id:
         return None
-    try:
-        return Member.objects.get(id=member_id)
-    except Member.DoesNotExist:
+
+    member = Member.objects.filter(id=member_id).first()
+    if not member:
         request.session.flush()
-        return None
+    return member
+
+
+def _parse_age(value, default=0):
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
 
 
 def _require_login(request):
@@ -33,10 +40,7 @@ def login(request):
         if not email or not password:
             messages.error(request, 'Please enter both email and password.')
         else:
-            try:
-                member = Member.objects.get(email=email)
-            except Member.DoesNotExist:
-                member = None
+            member = Member.objects.filter(email__iexact=email).first()
             if member and (check_password(password, member.password) or member.password == password):
                 request.session['member_id'] = member.id
                 messages.success(request, 'Successfully logged in.')
@@ -66,7 +70,7 @@ def register(request):
             messages.error(request, 'Passwords do not match.')
         elif not terms:
             messages.error(request, 'You must agree to the Terms of Service and Privacy Policy.')
-        elif Member.objects.filter(email=email).exists():
+        elif Member.objects.filter(email__iexact=email).exists():
             messages.error(request, 'Email already registered.')
         else:
             member = Member.objects.create(
@@ -74,7 +78,7 @@ def register(request):
                 email=email,
                 password=make_password(password),
                 gender=request.POST.get('gender', ''),
-                age=int(request.POST.get('age', 0) or 0),
+                age=_parse_age(request.POST.get('age', 0), 0),
                 city=request.POST.get('city', ''),
                 state=request.POST.get('state', ''),
                 country=request.POST.get('country', ''),
@@ -107,7 +111,7 @@ def edit_profile(request):
     if request.method == 'POST':
         member.name = request.POST.get('name', member.name).strip() or member.name
         member.gender = request.POST.get('gender', member.gender).strip() or member.gender
-        member.age = int(request.POST.get('age', member.age) or member.age)
+        member.age = _parse_age(request.POST.get('age', member.age), member.age)
         member.city = request.POST.get('city', member.city).strip() or member.city
         member.state = request.POST.get('state', member.state).strip() or member.state
         member.country = request.POST.get('country', member.country).strip() or member.country

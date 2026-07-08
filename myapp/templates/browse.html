@@ -1,8 +1,191 @@
-{% extends 'base.html' %}
-{% block title %}Let's Connect - Browse{% endblock %}
-{% block content %}
-  <div class="card">
-    <h2>Browse</h2>
-    <p>This page will show nearby people.</p>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Let's Connect - Browse</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f8f9fc;--fg:#1c1c22;--card:#fff;--primary:#7c3aed;--accent:#ff4da6;--muted:#71717a;--border:#e4e4e7;--secondary:#eff6ff;--green:#22c55e;--yellow:#eab308;--radius:0.75rem}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,var(--bg),var(--secondary));color:var(--fg);min-height:100vh}
+a{text-decoration:none;color:inherit}
+
+header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,0.7);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+header .container{max-width:1200px;margin:0 auto;padding:1rem;display:flex;justify-content:space-between;align-items:center}
+.nav-btn{padding:0.375rem 0.75rem;border:none;background:transparent;border-radius:var(--radius);cursor:pointer;font-size:0.8rem;color:var(--fg);display:flex;align-items:center;gap:0.375rem}
+.nav-btn:hover{background:rgba(0,0,0,0.05)}
+h1{font-size:1.5rem;font-weight:700}
+
+.container{max-width:1200px;margin:0 auto;padding:0 1rem}
+.main{padding:2rem 1rem}
+.layout{display:grid;grid-template-columns:260px 1fr;gap:1.5rem}
+
+.card{background:rgba(255,255,255,0.5);backdrop-filter:blur(12px);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem}
+.card h3{font-size:1rem;font-weight:600;margin-bottom:0.75rem}
+
+select{width:100%;padding:0.5rem;border:1px solid var(--border);border-radius:var(--radius);font-size:0.8rem;background:#fff;margin-bottom:0.75rem}
+label{font-size:0.8rem;font-weight:500;display:block;margin-bottom:0.375rem}
+
+.cat-btn{display:flex;align-items:center;gap:0.5rem;width:100%;padding:0.5rem 0.75rem;border:none;background:transparent;border-radius:var(--radius);cursor:pointer;font-size:0.8rem;text-align:left}
+.cat-btn:hover,.cat-btn.active{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff}
+
+.search-box{position:relative;margin-bottom:1rem}
+.search-box input{width:100%;padding:0.625rem 0.75rem 0.625rem 2.25rem;border:1px solid var(--border);border-radius:var(--radius);font-size:0.875rem;background:rgba(255,255,255,0.5)}
+.search-box input:focus{outline:none;border-color:var(--primary)}
+.search-icon{position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:var(--muted)}
+
+.results-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;color:var(--muted);font-size:0.875rem}
+
+.people-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.25rem}
+.person-card{background:rgba(255,255,255,0.5);backdrop-filter:blur(12px);border-radius:var(--radius);padding:1.25rem;transition:all 0.3s;border:1px solid transparent}
+.person-card:hover{box-shadow:0 8px 32px rgba(0,0,0,0.08);border-color:rgba(124,58,237,0.2)}
+.person-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem}
+.person-left{display:flex;gap:0.75rem;align-items:center}
+.person-avatar{position:relative}
+.avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600}
+.status-dot{position:absolute;bottom:0;right:0;width:12px;height:12px;border-radius:50%;border:2px solid var(--card)}
+.status-dot.online{background:var(--green)}
+.status-dot.away{background:var(--yellow)}
+.status-dot.offline{background:#9ca3af}
+.person-name{font-weight:600;font-size:1rem}
+.person-badges{display:flex;gap:0.375rem;margin-top:0.25rem;flex-wrap:wrap}
+.badge{padding:0.125rem 0.5rem;border-radius:999px;font-size:0.7rem;border:1px solid var(--border);background:var(--secondary)}
+.rating{font-size:0.875rem;font-weight:500}
+.person-bio{color:var(--muted);font-size:0.8rem;margin-bottom:0.75rem}
+.interests{display:flex;gap:0.375rem;flex-wrap:wrap;margin-bottom:1rem}
+.interest{padding:0.125rem 0.5rem;border:1px solid var(--border);border-radius:999px;font-size:0.7rem}
+.person-actions{display:flex;gap:0.5rem}
+.btn{padding:0.5rem 1rem;border-radius:var(--radius);font-weight:600;font-size:0.8rem;cursor:pointer;border:none;transition:opacity 0.2s}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;flex:1}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--fg)}
+.btn:hover{opacity:0.9}
+
+@media(max-width:768px){.layout{grid-template-columns:1fr}.people-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div style="display:flex;align-items:center;gap:1rem">
+      <a href="{% url 'dashboard' %}" class="nav-btn">← Back</a>
+      <h1>Browse People</h1>
+    </div>
+    <a href="{% url 'messages' %}" class="nav-btn">💬 Messages</a>
   </div>
-{% endblock %}
+</header>
+
+<div class="main">
+  <div class="container">
+    <div class="layout">
+      <!-- Sidebar -->
+      <div>
+        <div class="card">
+          <h3>🔧 Filters</h3>
+          <label>Category</label>
+          <select id="catFilter" onchange="filterPeople()">
+            <option value="all">All Categories</option>
+            <option value="hackathon">Hackathon Teams</option>
+            <option value="travel">Travel Buddies</option>
+            <option value="coffee">Coffee Meetups</option>
+            <option value="sports">Sports Partners</option>
+            <option value="music">Music Events</option>
+            <option value="photography">Photography</option>
+          </select>
+          <label>Distance</label>
+          <select id="distFilter">
+            <option value="5">Within 5km</option>
+            <option value="10">Within 10km</option>
+            <option value="20">Within 20km</option>
+            <option value="30" selected>Within 30km</option>
+          </select>
+        </div>
+        <div class="card">
+          <h3>Categories</h3>
+          <button class="cat-btn active" onclick="setCat('all',this)">👥 All People</button>
+          <button class="cat-btn" onclick="setCat('hackathon',this)">💻 Hackathon Teams</button>
+          <button class="cat-btn" onclick="setCat('travel',this)">✈️ Travel Buddies</button>
+          <button class="cat-btn" onclick="setCat('coffee',this)">☕ Coffee Meetups</button>
+          <button class="cat-btn" onclick="setCat('sports',this)">🏆 Sports Partners</button>
+          <button class="cat-btn" onclick="setCat('music',this)">🎵 Music Events</button>
+          <button class="cat-btn" onclick="setCat('photography',this)">📷 Photography</button>
+        </div>
+      </div>
+
+      <!-- Main -->
+      <div>
+        <div class="card" style="padding:0.75rem 1rem">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Search by name, interests, or skills..." oninput="filterPeople()">
+          </div>
+        </div>
+
+        <div class="results-bar">
+          <span id="resultCount">Found 6 people</span>
+          <span>📍 Within <span id="distLabel">30</span>km</span>
+        </div>
+
+        <div class="people-grid" id="peopleGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const people=[
+{name:"Alex Chen",initials:"AC",bio:"Full-stack developer looking for hackathon teammates",category:"hackathon",catLabel:"Hackathon Teams",distance:"2.5 km",interests:["React","Node.js","AI/ML"],status:"online",rating:4.8},
+{name:"Sarah Johnson",initials:"SJ",bio:"Adventure seeker planning weekend trips",category:"travel",catLabel:"Travel Buddies",distance:"5.1 km",interests:["Hiking","Photography","Culture"],status:"online",rating:4.9},
+{name:"Mike Rodriguez",initials:"MR",bio:"Coffee enthusiast and startup founder",category:"coffee",catLabel:"Coffee Meetups",distance:"1.8 km",interests:["Entrepreneurship","Tech","Coffee"],status:"away",rating:4.7},
+{name:"Emma Wilson",initials:"EW",bio:"Basketball player looking for regular games",category:"sports",catLabel:"Sports Partners",distance:"3.2 km",interests:["Basketball","Fitness","Health"],status:"online",rating:4.6},
+{name:"David Kim",initials:"DK",bio:"Music producer organizing jam sessions",category:"music",catLabel:"Music Events",distance:"4.7 km",interests:["Music Production","Guitar","Jazz"],status:"offline",rating:4.8},
+{name:"Lisa Zhang",initials:"LZ",bio:"Photographer exploring urban landscapes",category:"photography",catLabel:"Photography",distance:"6.3 km",interests:["Street Photography","Art","Design"],status:"online",rating:4.9}
+];
+
+function renderPeople(list){
+const grid=document.getElementById('peopleGrid');
+grid.innerHTML=list.map(p=>`
+<div class="person-card">
+  <div class="person-header">
+    <div class="person-left">
+      <div class="person-avatar"><div class="avatar">${p.initials}</div><div class="status-dot ${p.status}"></div></div>
+      <div><div class="person-name">${p.name}</div><div class="person-badges"><span class="badge">${p.catLabel}</span><span class="badge">📍 ${p.distance}</span></div></div>
+    </div>
+    <div class="rating">★ ${p.rating}</div>
+  </div>
+  <div class="person-bio">${p.bio}</div>
+  <div class="interests">${p.interests.map(i=>`<span class="interest">${i}</span>`).join('')}</div>
+  <div class="person-actions">
+    <a href="{% url 'messages' %}" class="btn btn-primary">💬 Connect</a>
+    <button class="btn btn-outline">View Profile</button>
+  </div>
+</div>`).join('');
+document.getElementById('resultCount').textContent=`Found ${list.length} people`;
+}
+
+function filterPeople(){
+const cat=document.getElementById('catFilter').value;
+const q=document.getElementById('searchInput').value.toLowerCase();
+const filtered=people.filter(p=>{
+  const matchCat=cat==='all'||p.category===cat;
+  const matchSearch=!q||p.name.toLowerCase().includes(q)||p.bio.toLowerCase().includes(q)||p.interests.some(i=>i.toLowerCase().includes(q));
+  return matchCat&&matchSearch;
+});
+renderPeople(filtered);
+}
+
+function setCat(cat,el){
+document.getElementById('catFilter').value=cat;
+document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+el.classList.add('active');
+filterPeople();
+}
+
+renderPeople(people);
+</script>
+
+</body>
+</html>
