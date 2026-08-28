@@ -3,7 +3,27 @@
 {% block content %}
   <div class="card">
     <h2>Profile</h2>
-    <p>Name: {{ member.name }}</p>
+    {% if member.avatar_url %}
+      <p><img src="{{ member.avatar_url }}" alt="avatar" style="max-width:120px;border-radius:6px;"></p>
+    {% endif %}
+    <p>Name: {{ member.display_name|default:member.name }}</p>
     <p>Email: {{ member.email }}</p>
+    {% if member.bio %}
+      <p><strong>About:</strong> {{ member.bio }}</p>
+    {% endif %}
+    {% if member.phone %}
+      <p><strong>Phone:</strong> {{ member.phone }}</p>
+    {% endif %}
+    {% if member.website %}
+      <p><strong>Website:</strong> <a href="{{ member.website }}" target="_blank">{{ member.website }}</a></p>
+    {% endif %}
+    <p>
+      <strong>Location:</strong>
+      {{ member.city }}{% if member.state %}, {{ member.state }}{% endif %}{% if member.country %}, {{ member.country }}{% endif %}
+    </p>
+    {% if member.interests %}
+      <p><strong>Interests:</strong> {{ member.interests }}</p>
+    {% endif %}
+    <p><small>Member since {{ member.created_at|date:"Y-m-d" }}</small></p>
   </div>
 {% endblock %}

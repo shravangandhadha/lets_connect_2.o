@@ -6,7 +6,20 @@
     <form method="post">
       {% csrf_token %}
       <p><label>Name</label><br><input type="text" name="name" value="{{ member.name }}"></p>
+      <p><label>Display name</label><br><input type="text" name="display_name" value="{{ member.display_name }}"></p>
+      <p><label>Avatar URL</label><br><input type="url" name="avatar_url" value="{{ member.avatar_url }}"></p>
+      <p><label>Bio</label><br><textarea name="bio" rows="4">{{ member.bio }}</textarea></p>
+      <p><label>Phone</label><br><input type="text" name="phone" value="{{ member.phone }}"></p>
+      <p><label>Date of birth</label><br><input type="date" name="dob" value="{{ member.dob }}"></p>
+      <p><label>Website</label><br><input type="url" name="website" value="{{ member.website }}"></p>
+      <p><label>GitHub</label><br><input type="url" name="github" value="{{ member.github }}"></p>
+      <p><label>LinkedIn</label><br><input type="url" name="linkedin" value="{{ member.linkedin }}"></p>
       <p><label>Age</label><br><input type="number" name="age" value="{{ member.age }}"></p>
+      <p><label>City</label><br><input type="text" name="city" value="{{ member.city }}"></p>
+      <p><label>State</label><br><input type="text" name="state" value="{{ member.state }}"></p>
+      <p><label>Country</label><br><input type="text" name="country" value="{{ member.country }}"></p>
+      <p><label>Interests</label><br><input type="text" name="interests" value="{{ member.interests }}"></p>
+      <p><label>New password (leave blank to keep)</label><br><input type="password" name="password" value=""></p>
       <button type="submit">Save</button>
     </form>
   </div>

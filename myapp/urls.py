@@ -13,4 +13,12 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/', views.profile, name='profile'),
     path('profile/edit/', views.edit_profile, name='edit_profile'),
+    path('posts/', views.posts_list, name='posts'),
+    path('posts/create/', views.create_post, name='create_post'),
+    path('posts/<int:post_id>/', views.post_detail, name='post_detail'),
+
+    # API endpoints
+    path('api/profile/<int:member_id>/', views.api_profile, name='api_profile'),
+    path('api/posts/', views.api_posts, name='api_posts'),
+    path('api/posts/<int:post_id>/', views.api_post_detail, name='api_post_detail'),
 ]
