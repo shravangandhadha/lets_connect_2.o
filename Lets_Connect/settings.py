@@ -61,7 +61,7 @@ WSGI_APPLICATION = 'Lets_Connect.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=f"sqlite:///{(BASE_DIR / 'db.sqlite3').as_posix()}",
+        default=os.environ.get('DATABASE_URL'),
         conn_max_age=600,
     )
 }
